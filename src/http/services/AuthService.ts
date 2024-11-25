@@ -15,15 +15,15 @@ import { handleCreateToken } from './UserTokenService'
 
 const userLoginSchema = z.object({
   email: z.string().email(),
-  password: z.string(),
+  senha: z.string(),
 })
 
 export type UserLoginParams = z.infer<typeof userLoginSchema>
 
 export async function handleRegister({
   email,
-  name,
-  password,
+  nome,
+  senha: password,
 }: CreateUserParams) {
   const { user: hasUserWithSameEmail } = await findUserByEmail(email)
 
@@ -35,14 +35,14 @@ export async function handleRegister({
 
   const user = await createUser({
     email: email,
-    name,
-    password: passwordHash,
+    nome,
+    senha: passwordHash,
   })
 
   return user
 }
 
-export async function handleLogin({ email, password }: UserLoginParams) {
+export async function handleLogin({ email, senha: password }: UserLoginParams) {
   const { user } = await findUserByEmail(email)
 
   if (!user) {

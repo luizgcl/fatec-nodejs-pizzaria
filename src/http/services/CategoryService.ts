@@ -3,17 +3,19 @@ import { prismaClient } from '@/database/prisma'
 import z from 'zod'
 
 const categorySchema = z.object({
-  name: z
+  nome: z
     .string()
     .min(3, 'O nome da categoria deve conter no mínimo 3 caracteres'),
 })
 
 export type CreateCategoryParams = z.infer<typeof categorySchema>
 
-export async function createCategory(data: CreateCategoryParams) {
+export async function createCategory({ nome: name }: CreateCategoryParams) {
   try {
     const category = await prismaClient.category.create({
-      data,
+      data: {
+        name,
+      },
     })
 
     return { category }

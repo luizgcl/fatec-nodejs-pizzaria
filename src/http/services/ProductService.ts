@@ -3,20 +3,33 @@ import { prismaClient } from '@/database/prisma'
 import z from 'zod'
 
 export const productSchema = z.object({
-  name: z
+  nome: z
     .string()
     .min(3, 'O nome do produto deve conter no mínimo 3 caracteres'),
-  price: z.number().positive('O preço deve ser um número positivo'),
+  preco: z.number().positive('O preço deve ser um número positivo'),
   banner: z.string(),
-  categoryId: z.string().uuid('Id de categoria inválido'),
+  descricao: z.string(),
+  id_categoria: z.string().uuid('Id de categoria inválido'),
 })
 
 export type CreateProductParams = z.infer<typeof productSchema>
 
-export async function createProduct(data: CreateProductParams) {
+export async function createProduct({
+  nome: name,
+  preco: price,
+  banner,
+  descricao: description,
+  id_categoria: categoryId,
+}: CreateProductParams) {
   try {
     const product = await prismaClient.product.create({
-      data,
+      data: {
+        name,
+        price,
+        banner,
+        description,
+        categoryId,
+      },
     })
 
     return { product }

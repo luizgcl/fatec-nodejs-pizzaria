@@ -38,6 +38,8 @@ model Product {
   price  Decimal @db.Decimal(10, 2)
   banner String
 
+  description String @db.Text
+
   categoryId String @map("category_id")
 
   createdAt DateTime @default(now()) @map("created_at")
