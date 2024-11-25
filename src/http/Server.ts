@@ -1,4 +1,5 @@
 import { env } from '@/env/Env'
+import * as AuthController from '@/http/controllers/AuthController'
 import cors from 'cors'
 import express from 'express'
 import 'express-async-errors'
@@ -15,6 +16,8 @@ export function startServer() {
       origin: '*',
     })
   )
+
+  app.use('/auth', AuthController.bootstrap(router))
 
   app.use(
     '/files',
