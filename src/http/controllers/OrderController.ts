@@ -40,7 +40,7 @@ export function bootstrap(router: Router) {
     handleAuthentication,
     async (req: Request, res: Response) => {
       const orderItemId = req.query.item_id as string
-      const { orderItem: response } =
+      const { deletedItem: response } =
         await OrderService.removeOrderItem(orderItemId)
 
       return res.json(response)
@@ -63,9 +63,9 @@ export function bootstrap(router: Router) {
     handleAuthentication,
     async (req: Request, res: Response) => {
       const orderId = req.query.id_pedido as string
-      const { order } = await OrderService.finishOrder(orderId)
+      const { oder: response } = await OrderService.finishOrder(orderId)
 
-      return res.json({ orderId: order.id })
+      return res.json(response)
     }
   )
 

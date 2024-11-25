@@ -156,6 +156,13 @@ export async function finishOrder(orderId: string) {
     where: {
       id: orderId,
     },
+    include: {
+      items: {
+        include: {
+          product: true,
+        },
+      },
+    },
   })
 
   if (!order) {
@@ -184,7 +191,11 @@ export async function finishOrder(orderId: string) {
     },
   })
 
-  return { order }
+  const total = order?.items.reduce((acc, item) => {
+    return acc + item.quantity * Number(item.product.price)
+  }, 0)
+
+  return { oder: { ...order, total } }
 }
 
 export async function summaryOder(orderId: string) {
