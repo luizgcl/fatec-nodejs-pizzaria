@@ -1,6 +1,8 @@
+// Luiz Gustavo Cardoso Leme
 import { env } from '@/env/Env'
 import * as AuthController from '@/http/controllers/AuthController'
 import * as CategoryController from '@/http/controllers/CategoryController'
+import * as OrderController from '@/http/controllers/OrderController'
 import * as ProductController from '@/http/controllers/ProductController'
 import cors from 'cors'
 import express from 'express'
@@ -22,6 +24,7 @@ export function startServer() {
   app.use(AuthController.bootstrap(router))
   app.use(CategoryController.bootstrap(router))
   app.use(ProductController.bootstrap(router))
+  app.use('/order', OrderController.bootstrap(router))
 
   app.use(
     '/files',
