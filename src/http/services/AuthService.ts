@@ -9,6 +9,7 @@ import {
   type CreateUserParams,
   createUser,
   findUserByEmail,
+  findUserById,
 } from './UserService'
 import { handleCreateToken } from './UserTokenService'
 
@@ -32,11 +33,13 @@ export async function handleRegister({
 
   const { passwordHash } = await handleEncodePassword(password)
 
-  await createUser({
+  const user = await createUser({
     email: email,
     name,
     password: passwordHash,
   })
+
+  return user
 }
 
 export async function handleLogin({ email, password }: UserLoginParams) {
@@ -56,4 +59,10 @@ export async function handleLogin({ email, password }: UserLoginParams) {
   }
 
   return handleCreateToken(user)
+}
+
+export async function handleShowUserInfo(id: string) {
+  const { user } = await findUserById(id)
+
+  return { ...user }
 }

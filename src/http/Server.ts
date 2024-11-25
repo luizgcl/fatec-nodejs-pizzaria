@@ -17,7 +17,7 @@ export function startServer() {
     })
   )
 
-  app.use('/auth', AuthController.bootstrap(router))
+  app.use(AuthController.bootstrap(router))
 
   app.use(
     '/files',

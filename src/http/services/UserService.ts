@@ -12,11 +12,13 @@ export type CreateUserParams = z.infer<typeof createUserSchema>
 
 export async function createUser(data: CreateUserParams) {
   try {
-    await prismaClient.user.create({
+    const user = await prismaClient.user.create({
       data: {
         ...data,
       },
     })
+
+    return user
   } catch {
     throw new CreateUserException()
   }
