@@ -72,7 +72,12 @@ export function bootstrap(router: Router) {
   router.get(
     '/summary',
     handleAuthentication,
-    async (req: Request, res: Response) => {}
+    async (req: Request, res: Response) => {
+      const orderId = req.query.id_pedido as string
+      const response = await OrderService.summaryOder(orderId)
+
+      return res.json(response)
+    }
   )
 
   return router

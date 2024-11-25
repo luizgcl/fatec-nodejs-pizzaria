@@ -39,7 +39,10 @@ export async function handleRegister({
     senha: passwordHash,
   })
 
-  return user
+  return {
+    ...user,
+    password: undefined,
+  }
 }
 
 export async function handleLogin({ email, senha: password }: UserLoginParams) {
@@ -64,5 +67,5 @@ export async function handleLogin({ email, senha: password }: UserLoginParams) {
 export async function handleShowUserInfo(id: string) {
   const { user } = await findUserById(id)
 
-  return { ...user }
+  return { ...user, password: undefined }
 }
