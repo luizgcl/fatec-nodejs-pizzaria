@@ -1,0 +1,11 @@
+name: 'pizzaria'
+
+services:
+  db:
+    image: bitnami/postgresql
+    environment:
+      - POSTGRESQL_USER=postgres
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRESQL_DATABASE=pizzaria
+    ports:
+      - 5432:5432
