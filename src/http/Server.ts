@@ -1,5 +1,6 @@
 import { env } from '@/env/Env'
 import * as AuthController from '@/http/controllers/AuthController'
+import * as CategoryController from '@/http/controllers/CategoryController'
 import cors from 'cors'
 import express from 'express'
 import 'express-async-errors'
@@ -18,6 +19,7 @@ export function startServer() {
   )
 
   app.use(AuthController.bootstrap(router))
+  app.use(CategoryController.bootstrap(router))
 
   app.use(
     '/files',
