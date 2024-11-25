@@ -1,4 +1,5 @@
 import { CreateOrderException } from '@/core/errors/CreateOrderException'
+import { Exception } from '@/core/errors/base/Exception'
 import { prismaClient } from '@/database/prisma'
 import z from 'zod'
 
@@ -42,6 +43,24 @@ export async function addOrderItem({
   id_produto: productId,
   quantidade: quantity,
 }: CreateOrderItemParams) {
+  const order = await prismaClient.order.findFirst({
+    where: {
+      id: orderId,
+    },
+  })
+
+  if (!order) {
+    throw new Exception('ORDER_NOT_FOUND', 'Pedido não encontrado.')
+  }
+
+  if (!order.draft) {
+    throw new Exception('ORDER_NOT_DRAFT', 'Pedido já enviado para cozinha.')
+  }
+
+  if (order.status) {
+    throw new Exception('ORDER_ALREADY_FINISHED', 'Pedido já finalizado.')
+  }
+
   const orderItem = await prismaClient.orderItem.create({
     data: {
       orderId,
@@ -54,13 +73,37 @@ export async function addOrderItem({
 }
 
 export async function removeOrderItem(orderItemId: string) {
-  const orderItem = await prismaClient.orderItem.delete({
+  const orderItem = await prismaClient.orderItem.findFirst({
     where: {
       id: orderItemId,
     },
   })
 
-  return { orderItem }
+  const order = await prismaClient.order.findFirst({
+    where: {
+      id: orderItem?.orderId,
+    },
+  })
+
+  if (!order) {
+    throw new Exception('ORDER_NOT_FOUND', 'Pedido não encontrado.')
+  }
+
+  if (!order.draft) {
+    throw new Exception('ORDER_NOT_DRAFT', 'Pedido já enviado para cozinha.')
+  }
+
+  if (order.status) {
+    throw new Exception('ORDER_ALREADY_FINISHED', 'Pedido já finalizado.')
+  }
+
+  const deletedItem = await prismaClient.orderItem.delete({
+    where: {
+      id: orderItemId,
+    },
+  })
+
+  return { deletedItem }
 }
 
 export async function sendOrder(orderId: string) {
@@ -76,7 +119,27 @@ export async function sendOrder(orderId: string) {
     )
   }
 
-  const order = await prismaClient.order.update({
+  const order = await prismaClient.order.findFirst({
+    where: {
+      id: orderId,
+    },
+  })
+
+  if (!order) {
+    throw new Exception('ORDER_NOT_FOUND', 'Pedido não encontrado.')
+  }
+
+  if (!order.draft) {
+    throw new Exception('ORDER_NOT_DRAFT', 'Pedido já enviado para cozinha.')
+  }
+
+  if (order.status) {
+    throw new Exception('ORDER_ALREADY_FINISHED', 'Pedido já finalizado.')
+  }
+
+  order.draft = false
+
+  await prismaClient.order.update({
     where: {
       id: orderId,
     },
@@ -89,7 +152,30 @@ export async function sendOrder(orderId: string) {
 }
 
 export async function finishOrder(orderId: string) {
-  const order = await prismaClient.order.update({
+  const order = await prismaClient.order.findFirst({
+    where: {
+      id: orderId,
+    },
+  })
+
+  if (!order) {
+    throw new Exception('ORDER_NOT_FOUND', 'Pedido não encontrado.')
+  }
+
+  if (order.draft) {
+    throw new Exception(
+      'ORDER_DRAFT',
+      'Pedido ainda não foi enviado para cozinha.'
+    )
+  }
+
+  if (order.status) {
+    throw new Exception('ORDER_ALREADY_FINISHED', 'Pedido já finalizado.')
+  }
+
+  order.status = true
+
+  prismaClient.order.update({
     where: {
       id: orderId,
     },
@@ -114,6 +200,13 @@ export async function summaryOder(orderId: string) {
       },
     },
   })
+
+  if (!order?.status) {
+    throw new Exception(
+      'ORDER_NOT_FINISHED',
+      'Esse pedido ainda não foi finalizado.'
+    )
+  }
 
   const total = order?.items.reduce((acc, item) => {
     return acc + item.quantity * Number(item.product.price)
