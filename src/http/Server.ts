@@ -16,7 +16,10 @@ export function startServer() {
     })
   )
 
-  app.use('/files', express.static(path.resolve(__dirname, '..', 'tmp')))
+  app.use(
+    '/files',
+    express.static(path.resolve(__dirname, '..', '..', 'storage', 'public'))
+  )
 
   app.use(handleError)
 
